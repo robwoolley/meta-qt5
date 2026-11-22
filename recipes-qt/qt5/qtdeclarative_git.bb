@@ -67,9 +67,11 @@ INSANE_SKIP:${PN}-ptest += "buildpaths"
 
 qtdeclarative_strip_buildpaths() {
     # Remove references to buildmachine paths in the comment headers of the examples source files
-    if [ -f "${B}/src/qmldevtools/qqmljsparser.cpp" ]; then
-        sed -i -e 's:${S}::g' "${B}/src/qmldevtools/qqmljsparser.cpp"
-    fi
+    for f in ${B}/src/qml/qqmljsparser.cpp ${B}/src/qmldevtools/qqmljsparser.cpp; do
+        if [ -f "$f" ]; then
+            sed -i -e 's:${S}::g' "$f"
+        fi
+    done
 }
 
 PACKAGE_PREPROCESS_FUNCS += "qtdeclarative_strip_buildpaths"
