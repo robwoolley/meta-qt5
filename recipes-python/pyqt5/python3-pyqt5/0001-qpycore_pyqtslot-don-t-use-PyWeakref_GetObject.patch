@@ -1,0 +1,40 @@
+From: Rob Woolley <rob.woolley@windriver.com>
+Subject: [PATCH] qpycore_pyqtslot: don't use PyWeakref_GetObject()
+
+PyWeakref_GetObject() was removed in Python 3.15.  Its replacement,
+PyWeakref_GetRef(), is only part of the limited API from Python 3.13, but
+PyQt5 is built with Py_LIMITED_API=0x030a0000.
+
+Call the weak reference object instead, which works with every version.
+The returned reference is still borrowed and Py_None is returned if the
+referent has been destroyed, so callers are unaffected.
+
+Upstream-Status: Pending
+AI-Generated: Uses Kiro (Claude Sonnet 5.5)
+Signed-off-by: Rob Woolley <rob.woolley@windriver.com>
+---
+--- a/qpy/QtCore/qpycore_pyqtslot.cpp
++++ b/qpy/QtCore/qpycore_pyqtslot.cpp
+@@ -219,7 +219,21 @@
+ {
+     // Use the weak reference if possible.
+     if (mself_wr)
+-        return PyWeakref_GetObject(mself_wr);
++    {
++        // AI-generated: PyWeakref_GetObject() has been removed from Python
++        // 3.15 and PyWeakref_GetRef() is not part of the limited API before
++        // Python 3.13.  Calling the weak reference works with all versions.
++        // Like PyWeakref_GetObject() we return a borrowed reference, or
++        // Py_None if the referent has gone.
++        PyObject *obj = PyObject_CallNoArgs(mself_wr);
++        if (!obj)
++        {
++            PyErr_Clear();
++            return Py_None;
++        }
++        Py_DECREF(obj);
++        return obj;
++    }
+ 
+     return mself;
+ }

@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d32239bcb673463ab874e80d47fae504"
 inherit pypi python3-dir python3native qmake5 qmake5_paths
 
 SRC_URI[sha256sum] = "d46b7804b1b10a4ff91753f8113e5b5580d2b4462f3226288e2d84497334898a"
+SRC_URI += "file://0001-qpycore_pyqtslot-don-t-use-PyWeakref_GetObject.patch"
 PYPI_PACKAGE = "PyQt5"
 
 S = "${UNPACKDIR}/PyQt5-${PV}"
